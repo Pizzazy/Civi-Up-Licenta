@@ -1,0 +1,38 @@
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
+
+const MODULE_LABELS = {
+  dashboard: 'Dashboard & Analize',
+  financiar: 'Financiar & OCR',
+  proiecte: 'Proiecte & Granturi',
+  crm: 'Email & CRM',
+  'email-crm': 'Email & CRM',
+  social: 'Social Media',
+  profil: 'Profilul Meu',
+  'ai-analize': 'AI Analize Date',
+  'management-conturi': 'Management Conturi',
+};
+
+export default function Topbar({ activeModule, onModuleChange }) {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  return (
+    <div className="h-14 bg-white border-b border-slate-200 flex items-center px-5 gap-4 flex-shrink-0 relative z-20">
+      <h2 className="text-sm text-slate-900 font-display flex-1 truncate">
+        {MODULE_LABELS[activeModule] || activeModule}
+      </h2>
+
+      {/* User avatar — click to open profile */}
+      <div onClick={() => navigate('/profil')} className="flex items-center gap-2.5 pl-3 border-l border-slate-200 cursor-pointer hover:opacity-80 transition-opacity">
+        <div className="w-8 h-8 bg-violet-100 border border-violet-200 rounded-xl flex items-center justify-center">
+          <span className="text-violet-700 text-xs font-black">{user?.avatar_initials || user?.avatar || user?.name?.slice(0, 1)?.toUpperCase() || 'U'}</span>
+        </div>
+        <div className="hidden md:block">
+          <p className="text-xs font-semibold text-slate-800 leading-tight">{user?.name}</p>
+          <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-[0.2em]">{user?.role}</p>
+        </div>
+      </div>
+    </div>
+  );
+}

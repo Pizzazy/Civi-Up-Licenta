@@ -1,0 +1,39 @@
+# Credentials
+credentials.txt
+.env
+.env.local
+
+# Dependencies
+node_modules/
+venv/
+.venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+dist/
+.vite/
+
+# Logs
+*.log
+npm-debug.log*
