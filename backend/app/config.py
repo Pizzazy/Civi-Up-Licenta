@@ -44,7 +44,7 @@ class Settings(BaseSettings):
     # OCR
     TESSERACT_CMD: str = "tesseract"
     OCR_SPACE_API_KEY: str = "K81442280488957"
-    OCR_SPACE_URL: str = "https://api.ocr.space/parse/image"
+    OCR_SPACE_URL = "[https://api.ocr.space/parse/image](https://api.ocr.space/parse/image)"
     OCR_SPACE_LANGUAGE: str = "ron"
 
     # Optional AI
