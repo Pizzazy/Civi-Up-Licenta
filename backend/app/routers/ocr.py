@@ -189,17 +189,24 @@ async def _ocr_via_ocr_space(
 
     data = {
         "apikey": settings.OCR_SPACE_API_KEY,
-        "language": settings.OCR_SPACE_LANGUAGE or "eng",
+        "language": "rum", 
         "isOverlayRequired": "false",
         "detectOrientation": "true",
+        "isTable": "true",
+        "OCREngine": "2"
     }
+    
     files = {
         "file": (filename or "upload", file_bytes, content_type or "application/octet-stream"),
     }
 
     timeout = httpx.Timeout(60.0, connect=10.0)
     async with httpx.AsyncClient(timeout=timeout) as client:
-        resp = await client.post(settings.OCR_SPACE_URL, data=data, files=files)
+        resp = await client.post(
+            "https://api.ocr.space/parse/image", 
+            data=data, 
+            files=files
+        )
 
     if resp.status_code >= 400:
         raise HTTPException(
