@@ -188,12 +188,11 @@ async def _ocr_via_ocr_space(
         )
 
     data = {
-        "apikey": settings.OCR_SPACE_API_KEY,
-        "language": "rum", 
+        "apikey": settings.OCR_SPACE_API_KEY, 
+        "language": "rom",
         "isOverlayRequired": "false",
         "detectOrientation": "true",
-        "isTable": "true",
-        "OCREngine": "2"
+        "OCREngine": "1"  
     }
     
     files = {
