@@ -31,7 +31,13 @@ class Settings(BaseSettings):
     APP_PORT: int = 8000
 
     # CORS — stored as comma-separated string, parsed into list
-    CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
+    CORS_ORIGINS: str = (
+        "http://localhost:5173,"
+        "http://localhost:3000,"
+        "https://civi-up-licenta.vercel.app,"
+        "https://civiup.ro,"
+        "https://www.civiup.ro"
+    )
 
     # OCR
     TESSERACT_CMD: str = "tesseract"
