@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -13,9 +13,31 @@ from app.schemas.calendar import (
     CalendarEventCreate,
     CalendarEventResponse,
     CalendarEventUpdate,
+    EventStatus,
 )
 
 router = APIRouter(prefix="/calendar", tags=["calendar"])
+
+
+def _event_status(event_date_value: object) -> EventStatus:
+    if isinstance(event_date_value, str):
+        try:
+            event_date_value = date.fromisoformat(event_date_value)
+        except ValueError:
+            return EventStatus.activ
+
+    if isinstance(event_date_value, date) and event_date_value < date.today():
+        return EventStatus.finalizat
+    return EventStatus.activ
+
+
+def _calendar_event_payload(record: Dict[str, Any]) -> Dict[str, Any]:
+    payload = dict(record)
+    event_type = str(payload.get("event_type") or "event")
+    if event_type not in {"meeting", "deadline", "event"}:
+        payload["event_type"] = "event"
+    payload["status"] = _event_status(payload.get("event_date")).value
+    return payload
 
 
 # ── CRUD ─────────────────────────────────────────────────────────────────────
@@ -47,7 +69,7 @@ async def list_events(
     q = q.order(order_by, desc=(order_dir.lower() == "desc"))
     q = q.range(offset, offset + limit - 1)
     resp = q.execute()
-    return [CalendarEventResponse(**r) for r in (resp.data or [])]
+    return [CalendarEventResponse(**_calendar_event_payload(r)) for r in (resp.data or [])]
 
 
 @router.post("/", response_model=CalendarEventResponse, status_code=201)
@@ -60,7 +82,7 @@ async def create_event(
     resp = supabase_admin.table("calendar_events").insert(data).execute()
     if not resp.data:
         raise HTTPException(status_code=500, detail="Eroare la creare eveniment.")
-    return CalendarEventResponse(**resp.data[0])
+    return CalendarEventResponse(**_calendar_event_payload(resp.data[0]))
 
 
 @router.put("/{event_id}", response_model=CalendarEventResponse)
@@ -97,7 +119,7 @@ async def update_event(
     )
     if not resp.data:
         raise HTTPException(status_code=404, detail="Eveniment negăsit.")
-    return CalendarEventResponse(**resp.data[0])
+    return CalendarEventResponse(**_calendar_event_payload(resp.data[0]))
 
 
 @router.delete("/{event_id}", status_code=status.HTTP_204_NO_CONTENT)

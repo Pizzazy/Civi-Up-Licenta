@@ -13,9 +13,11 @@ class EventType(str, Enum):
     meeting = "meeting"
     deadline = "deadline"
     event = "event"
-    eveniment = "eveniment"
-    training = "training"
-    alta = "alta"
+
+
+class EventStatus(str, Enum):
+    activ = "activ"
+    finalizat = "finalizat"
 
 
 class CalendarEventBase(BaseModel):
@@ -73,6 +75,7 @@ class CalendarEventResponse(CalendarEventBase):
     added_by: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+    status: EventStatus = EventStatus.activ
 
     model_config = {"from_attributes": True}
 
@@ -83,4 +86,5 @@ __all__ = [
     "CalendarEventCreate",
     "CalendarEventUpdate",
     "CalendarEventResponse",
+    "EventStatus",
 ]

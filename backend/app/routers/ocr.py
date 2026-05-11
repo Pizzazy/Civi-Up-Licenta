@@ -177,37 +177,49 @@ def _detect_document_type(text: str) -> str:
     return "bon"
 
 
-def _ocr_single_image(img, pytesseract_module) -> str:
-    from PIL import ImageFilter, ImageOps  # type: ignore
+def _preprocess_ocr_image(img):
+    from PIL import Image  # type: ignore
 
-    # Preprocess for better OCR on phone captures
-    gray = ImageOps.grayscale(img)
-    gray = ImageOps.autocontrast(gray)
-    gray = gray.filter(ImageFilter.SHARPEN)
+    if getattr(img, "mode", None) != "L":
+        gray = img.convert("L")
+    else:
+        gray = img
 
     w, h = gray.size
     max_dim = max(w, h)
-    if max_dim < 1800:
-        scale = 1800 / max_dim
-        gray = gray.resize((int(w * scale), int(h * scale)))
+    if max_dim > 1024:
+        scale = 1024 / max_dim
+        new_size = (max(1, int(w * scale)), max(1, int(h * scale)))
+        gray = gray.resize(new_size, resample=Image.LANCZOS)
 
-    bw = gray.point(lambda x: 0 if x < 165 else 255, mode="1").convert("L")
+    return gray
 
-    variants = [gray, bw]
+
+def _ocr_single_image(img, pytesseract_module) -> str:
+    from PIL import ImageFilter, ImageOps  # type: ignore
+
+    processed = _preprocess_ocr_image(img)
+
+    # Keep preprocessing lightweight to reduce memory pressure before Tesseract.
+    try:
+        processed = ImageOps.autocontrast(processed)
+        processed = processed.filter(ImageFilter.SHARPEN)
+    except Exception:
+        pass
+
+    results = []
     configs = ["--oem 1 --psm 6", "--oem 1 --psm 11"]
     langs = ["ron+eng", "eng"]
 
-    results = []
-    for variant in variants:
-        for cfg in configs:
-            for lang in langs:
-                try:
-                    t = pytesseract_module.image_to_string(variant, lang=lang, config=cfg)
-                    t = _normalize_text(t)
-                    if t:
-                        results.append(t)
-                except Exception:
-                    continue
+    for cfg in configs:
+        for lang in langs:
+            try:
+                t = pytesseract_module.image_to_string(processed, lang=lang, config=cfg)
+                t = _normalize_text(t)
+                if t:
+                    results.append(t)
+            except Exception:
+                continue
 
     if not results:
         return ""

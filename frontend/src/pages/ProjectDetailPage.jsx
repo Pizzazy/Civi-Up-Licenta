@@ -22,7 +22,7 @@ export default function ProjectDetailPage({ project: initialProject, onBack }) {
   const [newEvent, setNewEvent] = useState({ title: '', date: '', time: '10:00', type: 'meeting' });
   const [showAddBeneficiari, setShowAddBeneficiari] = useState(false);
   const [newBenefCount, setNewBenefCount] = useState(0);
-  const [newBenefEvent, setNewBenefEvent] = useState({ title: '', date: '', time: '10:00', type: 'eveniment' });
+  const [newBenefEvent, setNewBenefEvent] = useState({ title: '', date: '', time: '10:00', type: 'event' });
   const [taskError, setTaskError] = useState('');
   const [eventError, setEventError] = useState('');
   const [expandedTask, setExpandedTask] = useState(null);
@@ -112,6 +112,17 @@ export default function ProjectDetailPage({ project: initialProject, onBack }) {
 
   const getInitials = (u) => u?.avatar_initials || u?.avatar || (u?.full_name || u?.name || '??').split(' ').map(p => p[0]).join('').substring(0, 2).toUpperCase();
 
+  const getEventStatus = (event) => {
+    if (event?.status) return event.status;
+    const eventDate = event?.event_date || event?.date;
+    if (!eventDate) return 'activ';
+    const parsed = new Date(`${eventDate}T00:00:00`);
+    if (Number.isNaN(parsed.getTime())) return 'activ';
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return parsed < today ? 'finalizat' : 'activ';
+  };
+
   // Members from API are already user objects {id, full_name, avatar_initials, role}
   const members = project.members || [];
 
@@ -171,7 +182,7 @@ export default function ProjectDetailPage({ project: initialProject, onBack }) {
         title: newEvent.title,
         event_date: newEvent.date,
         start_time: newEvent.time,
-        event_type: newEvent.type === 'eveniment' ? 'event' : newEvent.type,
+        event_type: newEvent.type,
         project_id: project.id,
       });
       if (created?.id) setEvents((prev) => [...prev, created]);
@@ -200,7 +211,7 @@ export default function ProjectDetailPage({ project: initialProject, onBack }) {
             title: newBenefEvent.title,
             event_date: newBenefEvent.date,
             start_time: newBenefEvent.time,
-            event_type: newBenefEvent.type || 'eveniment',
+            event_type: newBenefEvent.type || 'event',
             project_id: project.id,
           });
           if (created?.id) setEvents((prev) => [...prev, created]);
@@ -213,7 +224,7 @@ export default function ProjectDetailPage({ project: initialProject, onBack }) {
     }
     setNewBenefCount(0);
     setShowAddBeneficiari(false);
-    setNewBenefEvent({ title: '', date: '', time: '10:00', type: 'eveniment' });
+    setNewBenefEvent({ title: '', date: '', time: '10:00', type: 'event' });
   };
 
   const deleteEvent = async (eventId) => {
@@ -428,9 +439,7 @@ export default function ProjectDetailPage({ project: initialProject, onBack }) {
                 <select value={newBenefEvent.type} onChange={(e) => setNewBenefEvent((p) => ({ ...p, type: e.target.value }))} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-xs focus:outline-none">
                   <option value="meeting">Ședință</option>
                   <option value="deadline">Deadline</option>
-                  <option value="eveniment">Eveniment / Workshop / Prezentare</option>
-                  <option value="training">Training</option>
-                  <option value="alta">Alt tip</option>
+                  <option value="event">Eveniment</option>
                 </select>
                 <div className="flex gap-2">
                   <button onClick={addBeneficiari} className="bg-violet-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold">Salvează</button>
@@ -488,7 +497,7 @@ export default function ProjectDetailPage({ project: initialProject, onBack }) {
                   <input type="time" value={newEvent.time} onChange={(e) => setNewEvent((p) => ({ ...p, time: e.target.value }))} className="w-24 border border-slate-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-violet-400" />
                 </div>
                 <select value={newEvent.type} onChange={(e) => setNewEvent((p) => ({ ...p, type: e.target.value }))} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-xs focus:outline-none">
-                  <option value="meeting">Ședință</option><option value="deadline">Deadline</option><option value="eveniment">Eveniment</option>
+                  <option value="meeting">Ședință</option><option value="deadline">Deadline</option><option value="event">Eveniment</option>
                 </select>
                 <div className="flex gap-2">
                   <button onClick={addEvent} className="bg-violet-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold">Salvează</button>
@@ -502,12 +511,16 @@ export default function ProjectDetailPage({ project: initialProject, onBack }) {
               {!eventsLoading && events.length === 0 && <p className="text-sm text-slate-400 text-center py-4">Niciun eveniment adăugat.</p>}
               {events.map((ev) => {
                 const evType = ev.event_type || ev.type || 'event';
+                const evStatus = getEventStatus(ev);
                 return (
-                <div key={ev.id} className={`flex items-start gap-3 p-3 rounded-xl border ${evType === 'deadline' ? 'border-rose-200 bg-rose-50' : evType === 'meeting' ? 'border-blue-200 bg-blue-50' : 'border-emerald-200 bg-emerald-50'}`}>
+                <div key={ev.id} className={`flex items-start gap-3 p-3 rounded-xl border ${evType === 'deadline' ? 'border-rose-200 bg-rose-50' : evType === 'meeting' ? 'border-blue-200 bg-blue-50' : 'border-emerald-200 bg-emerald-50'} ${evStatus === 'finalizat' ? 'opacity-75' : ''}`}>
                   <div className={`w-1.5 h-8 rounded-full ${evType === 'deadline' ? 'bg-rose-400' : evType === 'meeting' ? 'bg-blue-400' : 'bg-emerald-400'}`}></div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-slate-700">{ev.title}</p>
                     <p className="text-xs text-slate-400 mt-0.5">{ev.event_date || ev.date || '—'} · {ev.start_time || ev.time || '—'}</p>
+                    <div className="mt-1">
+                      <Badge status={evStatus} />
+                    </div>
                   </div>
                   <button
                     onClick={() => deleteEvent(ev.id)}
