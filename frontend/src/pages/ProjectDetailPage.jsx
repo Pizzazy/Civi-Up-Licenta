@@ -254,7 +254,7 @@ export default function ProjectDetailPage({ project: initialProject, onBack }) {
     setOcrError('');
     try {
       const data = await ocrAPI.process(file);
-      setOcrData(data);
+      setOcrData(data?.extracted || data);
     } catch (err) {
       setOcrError(err.message || 'Procesarea OCR a eșuat.');
     } finally {
