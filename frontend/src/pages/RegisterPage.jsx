@@ -47,6 +47,8 @@ export default function RegisterPage() {
   };
 
   if (success) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-violet-900 via-violet-800 to-indigo-900 flex items-center justify-center p-8">
         <div className="w-full max-w-md text-center">
           <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-2xl">
             <div className="w-16 h-16 bg-emerald-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-emerald-400/30">
