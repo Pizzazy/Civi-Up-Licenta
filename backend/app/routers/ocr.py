@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import io
 import re
 import uuid
 from datetime import datetime, timezone
@@ -10,6 +9,7 @@ from typing import Any, Dict, Optional
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from pydantic import BaseModel
+import httpx
 
 from app.config import settings
 from app.database import supabase_admin
@@ -177,60 +177,48 @@ def _detect_document_type(text: str) -> str:
     return "bon"
 
 
-def _preprocess_ocr_image(img):
-    from PIL import Image  # type: ignore
+async def _ocr_via_ocr_space(
+    file_bytes: bytes,
+    filename: str,
+    content_type: str,
+) -> str:
+    if not settings.OCR_SPACE_API_KEY:
+        raise HTTPException(
+            status_code=500,
+            detail="OCR.space API key lipsește. Setează OCR_SPACE_API_KEY în backend.",
+        )
 
-    if getattr(img, "mode", None) != "L":
-        gray = img.convert("L")
-    else:
-        gray = img
+    data = {
+        "apikey": settings.OCR_SPACE_API_KEY,
+        "language": settings.OCR_SPACE_LANGUAGE or "eng",
+        "isOverlayRequired": "false",
+        "detectOrientation": "true",
+    }
+    files = {
+        "file": (filename or "upload", file_bytes, content_type or "application/octet-stream"),
+    }
 
-    w, h = gray.size
-    max_dim = max(w, h)
-    if max_dim > 1024:
-        scale = 1024 / max_dim
-        new_size = (max(1, int(w * scale)), max(1, int(h * scale)))
-        gray = gray.resize(new_size, resample=Image.LANCZOS)
+    timeout = httpx.Timeout(60.0, connect=10.0)
+    async with httpx.AsyncClient(timeout=timeout) as client:
+        resp = await client.post(settings.OCR_SPACE_URL, data=data, files=files)
 
-    return gray
+    if resp.status_code >= 400:
+        raise HTTPException(
+            status_code=502,
+            detail=f"OCR.space a răspuns cu eroare HTTP {resp.status_code}.",
+        )
 
+    payload = resp.json()
+    if payload.get("IsErroredOnProcessing"):
+        message = payload.get("ErrorMessage") or payload.get("ErrorDetails") or "Eroare OCR.space."
+        if isinstance(message, list):
+            message = "; ".join(str(m) for m in message if m)
+        raise HTTPException(status_code=502, detail=str(message))
 
-def _ocr_single_image(img, pytesseract_module) -> str:
-    from PIL import ImageFilter, ImageOps  # type: ignore
-
-    processed = _preprocess_ocr_image(img)
-
-    # Keep preprocessing lightweight to reduce memory pressure before Tesseract.
-    try:
-        processed = ImageOps.autocontrast(processed)
-        processed = processed.filter(ImageFilter.SHARPEN)
-    except Exception:
-        pass
-
-    results = []
-    configs = ["--oem 1 --psm 6", "--oem 1 --psm 11"]
-    langs = ["ron+eng", "eng"]
-
-    for cfg in configs:
-        for lang in langs:
-            try:
-                t = pytesseract_module.image_to_string(processed, lang=lang, config=cfg)
-                t = _normalize_text(t)
-                if t:
-                    results.append(t)
-            except Exception:
-                continue
-
-    if not results:
-        return ""
-
-    # Prefer results that include finance keywords and have more content
-    def score(text_value: str) -> int:
-        keywords = ["TOTAL", "FACTURA", "NR", "RON", "DATA"]
-        kw_score = sum(1 for kw in keywords if kw in text_value.upper()) * 100
-        return kw_score + len(text_value)
-
-    return max(results, key=score)
+    results = payload.get("ParsedResults") or []
+    parsed = [r.get("ParsedText", "") for r in results if isinstance(r, dict)]
+    text = _normalize_text("\n".join(parsed))
+    return text
 
 
 def _calculate_confidence(extracted: Dict[str, Optional[str]]) -> float:
@@ -280,32 +268,18 @@ async def process_receipt(
     }
 
     try:
-        import pytesseract  # type: ignore
-        from PIL import Image  # type: ignore
-
-        pytesseract.pytesseract.tesseract_cmd = settings.TESSERACT_CMD
-
-        if file.content_type == "application/pdf":
-            from pdf2image import convert_from_bytes  # type: ignore
-
-            images = convert_from_bytes(file_bytes, dpi=300)
-            texts = []
-            for img in images:
-                texts.append(_ocr_single_image(img, pytesseract))
-            raw_text = "\n".join(texts)
-        else:
-            img = Image.open(io.BytesIO(file_bytes))
-            raw_text = _ocr_single_image(img, pytesseract)
-
+        raw_text = await _ocr_via_ocr_space(
+            file_bytes=file_bytes,
+            filename=file.filename or "receipt",
+            content_type=file.content_type or "application/octet-stream",
+        )
         extracted = _parse_extracted(raw_text)
-
+    except HTTPException:
+        raise
     except Exception as exc:
         raise HTTPException(
             status_code=500,
-            detail=(
-                "OCR local indisponibil. Instalează Tesseract și setează TESSERACT_CMD corect. "
-                f"Detalii: {exc}"
-            ),
+            detail=f"OCR prin OCR.space a eșuat. Detalii: {exc}",
         ) from exc
 
     confidence = _calculate_confidence(extracted)

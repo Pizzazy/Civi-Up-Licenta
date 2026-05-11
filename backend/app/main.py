@@ -52,10 +52,18 @@ app = FastAPI(
 )
 
 # ── CORS ─────────────────────────────────────────────────────────────────────
+# On dev: allow all origins. On production: check specific list or allow vercel/localhost
 
-origins = (
-    ["*"] if settings.is_dev else settings.cors_origins_list
-)
+if settings.is_dev:
+    origins = ["*"]
+else:
+    # Production: allow hardcoded list + Vercel domains + localhost for testing
+    origins = settings.cors_origins_list
+    # Ensure we cover Vercel deployments
+    if "https://*.vercel.app" not in origins:
+        origins.append("https://civi-up-licenta.vercel.app")
+        origins.append("https://civiup.ro")
+        origins.append("https://www.civiup.ro")
 
 app.add_middleware(
     CORSMiddleware,

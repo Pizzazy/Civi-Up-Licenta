@@ -31,16 +31,21 @@ class Settings(BaseSettings):
     APP_PORT: int = 8000
 
     # CORS — stored as comma-separated string, parsed into list
+    # On production/Render, this will allow Vercel domains and localhost for dev
     CORS_ORIGINS: str = (
         "http://localhost:5173,"
         "http://localhost:3000,"
         "https://civi-up-licenta.vercel.app,"
         "https://civiup.ro,"
-        "https://www.civiup.ro"
+        "https://www.civiup.ro,"
+        "https://*.vercel.app"
     )
 
     # OCR
     TESSERACT_CMD: str = "tesseract"
+    OCR_SPACE_API_KEY: str = "K81442280488957"
+    OCR_SPACE_URL: str = "https://api.ocr.space/parse/image"
+    OCR_SPACE_LANGUAGE: str = "ron"
 
     # Optional AI
     ANTHROPIC_API_KEY: str | None = None
