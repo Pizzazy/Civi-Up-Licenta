@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import re
 import uuid
-from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
@@ -284,22 +283,8 @@ async def process_receipt(
 
     confidence = _calculate_confidence(extracted)
 
-    # 3. Save OCR job
-    now = datetime.now(timezone.utc).isoformat()
-    job_data = {
-        "file_url": file_url,
-        "status": "completed",
-        "extracted_data": extracted,
-        "confidence": confidence,
-        "started_at": now,
-        "completed_at": now,
-        "created_by": uid,
-    }
-    job_resp = supabase_admin.table("ocr_jobs").insert(job_data).execute()
-    job_id = job_resp.data[0]["id"] if job_resp.data else file_id
-
     return OCRResult(
-        job_id=job_id,
+        job_id=file_id,
         extracted=extracted,
         confidence=confidence,
         document_type=_detect_document_type(raw_text),
