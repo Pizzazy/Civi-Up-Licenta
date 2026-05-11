@@ -1,8 +1,12 @@
 // ════════════════════════════════════════════════════════════════
 // API SERVICE — connects to FastAPI backend
 // ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════
+// API SERVICE — connects to FastAPI backend
+// ════════════════════════════════════════════════════════════════
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+const API_BASE_URL = 'https://civi-up-licenta.onrender.com/api';
+
 const GET_CACHE_TTL_MS = 30_000;
 const getResponseCache = new Map();
 const inflightGetRequests = new Map();
