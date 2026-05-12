@@ -216,7 +216,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
         <StatCard icon={TrendingUp} label="Venituri Totale" value={`${formatRON(summary?.total_venituri || 0)} RON`} color="violet" />
         <StatCard icon={DollarSign} label="Cheltuieli Aprobate" value={`${formatRON(summary?.total_cheltuieli || 0)} RON`} color="emerald" />
         <StatCard icon={Heart} label="Beneficiari Direcți" value={(summary?.total_beneficiari_directi || 0).toLocaleString('ro-RO')} color="blue" />

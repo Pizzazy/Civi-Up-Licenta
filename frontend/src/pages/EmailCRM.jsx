@@ -959,13 +959,13 @@ function ContactsPage({ contacts, setContacts, groupCounts, refreshContacts }) {
 
   return (
     <div>
-      <div className="flex items-center gap-3 mb-5">
-        <div className="flex-1 relative">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 md:gap-3 mb-5">
+        <div className="w-full sm:flex-1 relative">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Caută contacte..." className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-100" />
         </div>
-        <button onClick={() => setShowImportModal(true)} className="px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 flex items-center gap-2"><Upload className="w-4 h-4" /> Import CSV</button>
-        <button onClick={() => setShowAddModal(true)} className="px-4 py-2.5 bg-violet-700 text-white rounded-xl text-sm font-bold hover:bg-violet-600 flex items-center gap-2"><Plus className="w-4 h-4" /> Adaugă Contact</button>
+        <button onClick={() => setShowImportModal(true)} className="w-full sm:w-auto px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 flex items-center justify-center gap-2"><Upload className="w-4 h-4" /> Import CSV</button>
+        <button onClick={() => setShowAddModal(true)} className="w-full sm:w-auto px-4 py-2.5 bg-violet-700 text-white rounded-xl text-sm font-bold hover:bg-violet-600 flex items-center justify-center gap-2"><Plus className="w-4 h-4" /> Adaugă Contact</button>
       </div>
 
       <div className="flex gap-2 mb-5 overflow-x-auto pb-1">

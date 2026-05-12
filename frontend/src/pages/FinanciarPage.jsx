@@ -266,7 +266,7 @@ export default function FinanciarPage() {
     <div className="space-y-5">
       {error && <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-center gap-2"><AlertCircle className="w-4 h-4" />{error}</div>}
 
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         <StatCard icon={DollarSign} label="Total Venituri" value={`${totalIncome.toLocaleString('ro-RO')} RON`} changeType="up" change="înregistrate" color="emerald" />
         <StatCard icon={Activity} label="Total Cheltuieli" value={`${totalExpenses.toLocaleString('ro-RO')} RON`} changeType="up" change="înregistrate" color="violet" />
         <StatCard icon={CheckCircle} label="Sold" value={`${(totalIncome - totalExpenses).toLocaleString('ro-RO')} RON`} changeType={totalIncome - totalExpenses >= 0 ? 'up' : 'down'} change="curent" color="blue" />
@@ -275,7 +275,7 @@ export default function FinanciarPage() {
 
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm">
         <div className="p-4 border-b border-slate-100 flex items-center justify-between gap-3">
-          <div className="flex gap-2 items-center">
+          <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
             <button onClick={() => setTab('cheltuieli')} className={`px-4 py-2 rounded-xl text-sm font-bold ${tab === 'cheltuieli' ? 'bg-violet-600 text-white' : 'bg-slate-100 text-slate-600'}`}>Cheltuieli</button>
             <button onClick={() => setTab('venituri')} className={`px-4 py-2 rounded-xl text-sm font-bold ${tab === 'venituri' ? 'bg-violet-600 text-white' : 'bg-slate-100 text-slate-600'}`}>Venituri</button>
             
@@ -287,7 +287,7 @@ export default function FinanciarPage() {
               </div>
             )}
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <button onClick={() => setShowFilters((v) => !v)} className="px-4 py-2 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 flex items-center gap-2"><Filter className="w-4 h-4" />Filtre</button>
             <button onClick={() => { resetForm(); setShowAdd(true); }} className="px-4 py-2 rounded-xl bg-violet-600 text-white text-sm font-bold flex items-center gap-2"><Plus className="w-4 h-4" />Adaugă</button>
           </div>

@@ -105,7 +105,7 @@ export default function ProiectePage() {
         )}
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         <StatCard icon={Target} label="Total Granturi" value={`${totalGrant.toLocaleString('ro-RO')} RON`} color="violet" />
         <StatCard icon={Users} label="Beneficiari Direcți" value={String(totalBeneficiari)} color="blue" />
         <StatCard icon={CheckCircle} label="Proiecte Finalizate" value={`${finalizate} / ${projects.length}`} color="emerald" />
