@@ -117,6 +117,13 @@ export default function ProjectDetailPage({ project: initialProject, onBack }) {
     setEventError('');
   }, [project.id]);
 
+  useEffect(() => {
+    if (tab !== 'calendar') return;
+    setEventsLoaded(false);
+    setEventsLoading(false);
+    setEventError('');
+  }, [tab]);
+
   const getInitials = (u) => u?.avatar_initials || u?.avatar || (u?.full_name || u?.name || '??').split(' ').map(p => p[0]).join('').substring(0, 2).toUpperCase();
 
   const getEventStatus = (event) => {
@@ -128,6 +135,16 @@ export default function ProjectDetailPage({ project: initialProject, onBack }) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     return parsed < today ? 'inactiv' : 'activ';
+  };
+
+  const getProjectStatus = () => {
+    const deadline = project?.deadline;
+    if (!deadline) return project?.status || 'activ';
+    const parsed = new Date(`${deadline}T00:00:00`);
+    if (Number.isNaN(parsed.getTime())) return project?.status || 'activ';
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return parsed < today ? 'inactiv' : (project?.status || 'activ');
   };
 
   // Members from API are already user objects {id, full_name, avatar_initials, role}
@@ -326,7 +343,7 @@ export default function ProjectDetailPage({ project: initialProject, onBack }) {
         <div className="flex-1">
           <h2 className="text-xl font-black text-slate-800">{project.name}</h2>
           <div className="flex items-center gap-3 mt-1">
-            <Badge status={project.status} />
+            <Badge status={getProjectStatus()} />
             <span className="text-xs text-slate-400">{project.category || '—'} · Deadline: {project.deadline || '—'}</span>
             <div className="flex items-center gap-1">
               {members.map((m) => (
