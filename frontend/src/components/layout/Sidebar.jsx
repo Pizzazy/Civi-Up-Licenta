@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, DollarSign, FolderOpen, Mail, Share2,
-  Heart, ChevronRight, Menu, LogOut, User, Bot, ShieldCheck,
+  Heart, ChevronRight, Menu, LogOut, User, Bot, ShieldCheck, X,
 } from 'lucide-react';
 import { NAV_ITEMS, APP_NAME, ROLE_LABELS } from '@/data/constants';
 import { useAuth } from '@/context/AuthContext';
@@ -12,7 +12,7 @@ const ICON_MAP = {
   Bot, ShieldCheck,
 };
 
-export default function Sidebar({ active, onChange, collapsed, onToggle }) {
+export default function Sidebar({ active, onChange, collapsed, onToggle, isMobile = false }) {
   const { user, logout } = useAuth();
 
   const visibleNav = filterNavByRole(NAV_ITEMS, user?.role);
@@ -33,7 +33,7 @@ export default function Sidebar({ active, onChange, collapsed, onToggle }) {
           </div>
         )}
         <button onClick={onToggle} className={`text-slate-400 hover:text-slate-700 transition-colors flex-shrink-0 ${collapsed ? '' : 'ml-auto'}`}>
-          {collapsed ? <ChevronRight className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+          {isMobile ? <X className="w-4 h-4" /> : collapsed ? <ChevronRight className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
         </button>
       </div>
 
