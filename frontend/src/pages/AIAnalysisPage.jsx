@@ -398,106 +398,6 @@ export default function AIAnalysisPage() {
               <div className="space-y-2 md:space-y-3">
                 {history.map((item) => (
                   <button
-                  onClick={() => setChartType('pie')}
-                  className={`inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${
-                    chartType === 'pie' ? 'bg-white text-violet-700 shadow-sm' : 'text-slate-500'
-                  }`}
-                >
-                  <PieChartIcon className="w-4 h-4" />
-                  Pie
-                </button>
-              </div>
-            </div>
-
-            {!analysis ? (
-              <div className="flex min-h-[320px] flex-col items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-slate-50/60 px-6 text-center">
-                <TrendingUp className="w-12 h-12 text-slate-300 mb-3" />
-                <p className="text-base font-semibold text-slate-700">Aștept o întrebare</p>
-                <p className="mt-2 max-w-md text-sm text-slate-500">
-                  După ce trimiți o întrebare, aici apare graficul construit din <span className="font-semibold text-slate-700">chart_data</span>.
-                </p>
-              </div>
-            ) : activeChartData.length === 0 ? (
-              <div className="flex min-h-[320px] flex-col items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-slate-50/60 px-6 text-center">
-                <Clock className="w-12 h-12 text-slate-300 mb-3" />
-                <p className="text-base font-semibold text-slate-700">Nu există date suficiente</p>
-                <p className="mt-2 max-w-md text-sm text-slate-500">
-                  AI-ul a returnat concluzia text, dar nu a găsit o serie utilă pentru grafic.
-                </p>
-              </div>
-            ) : chartType === 'bar' ? (
-              <div className="space-y-4">
-                <ResponsiveContainer width="100%" height={330}>
-                  <BarChart data={activeChartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                    <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} tickFormatter={(value) => `${(Number(value) / 1000).toFixed(0)}k`} />
-                    <Tooltip formatter={(value) => formatMoney(value)} contentStyle={{ borderRadius: 14, border: '1px solid #e2e8f0' }} />
-                    <Bar dataKey="value" name="Suma (RON)" radius={[10, 10, 0, 0]} fill="#6b4cc2" />
-                  </BarChart>
-                </ResponsiveContainer>
-
-                <div className="grid gap-2 sm:grid-cols-2">
-                  {activeChartData.slice(0, 6).map((item, index) => (
-                    <div key={item.name} className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white/80 px-3 py-2">
-                      <span className="h-3 w-3 rounded-full" style={{ backgroundColor: PIE_COLORS[index % PIE_COLORS.length] }} />
-                      <span className="flex-1 text-sm text-slate-600">{item.name}</span>
-                      <span className="text-sm font-bold text-slate-800">{formatMoney(item.value)}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(240px,0.65fr)] items-center">
-                <ResponsiveContainer width="100%" height={320}>
-                  <PieChart>
-                    <Pie
-                      data={activeChartData}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={120}
-                      innerRadius={58}
-                      paddingAngle={4}
-                    >
-                      {activeChartData.map((_, index) => (
-                        <Cell key={index} fill={PIE_COLORS[index % PIE_COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={(value) => formatMoney(value)} contentStyle={{ borderRadius: 14, border: '1px solid #e2e8f0' }} />
-                    <Legend wrapperStyle={{ fontSize: 12 }} />
-                  </PieChart>
-                </ResponsiveContainer>
-
-                <div className="space-y-3">
-                  {activeChartData.slice(0, 7).map((item, index) => (
-                    <div key={item.name} className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white/80 px-3 py-2.5">
-                      <span className="h-3 w-3 rounded-full flex-shrink-0" style={{ backgroundColor: PIE_COLORS[index % PIE_COLORS.length] }} />
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold text-slate-700">{item.name}</p>
-                        <p className="text-xs text-slate-400">{formatMoney(item.value)}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="space-y-5">
-          <div className="paper-card p-5">
-            <p className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
-              <MessageSquare className="w-4 h-4" />
-              Istoric
-            </p>
-            {history.length === 0 ? (
-              <p className="py-4 text-sm text-slate-500">Nicio întrebare procesată încă.</p>
-            ) : (
-              <div className="space-y-3">
-                {history.map((item) => (
-                  <button
                     key={item.id}
                     type="button"
                     onClick={() => runAnalysis(item.question)}
@@ -524,6 +424,8 @@ export default function AIAnalysisPage() {
           </div>
         </div>
       </div>
+
     </div>
+
   );
 }
