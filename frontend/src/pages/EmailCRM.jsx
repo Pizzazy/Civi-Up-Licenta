@@ -456,15 +456,6 @@ function PropertyPanel({ block, onChange }) {
 // AI CHAT PANEL
 // ══════════════════════════════════════════════════════════════════════════════
 
-const AI_QUICK = [
-  'Scrie un titlu captivant',
-  'Generează un paragraf de introducere',
-  'Scrie un CTA puternic',
-  'Corectează diacriticele',
-  'Scurtează textul',
-  'Fă tonul mai prietenos',
-];
-
 function fakeAIResponse(msg) {
   const l = msg.toLowerCase();
   if (l.includes('titlu')) return '1. „Împreună construim un viitor mai bun"\n2. „Fiecare gest contează — Raport de Impact 2025"\n3. „Descoperă cum am schimbat comunitatea"';
@@ -490,7 +481,7 @@ function AIChatPanel({ messages, onSend, onInsert }) {
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto px-3 py-2 space-y-3">
-        {messages.length === 0 && <p className="text-xs text-slate-500 text-center mt-8">Întreabă AI-ul orice despre emailul tău ✨</p>}
+        {messages.length === 0 && <p className="text-xs text-slate-500 text-center mt-8">Ce text vrei să generez?</p>}
         {messages.map((m, i) => (
           <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[220px] rounded-2xl px-3 py-2 text-sm whitespace-pre-wrap ${m.role === 'user' ? 'bg-violet-700 text-white' : 'bg-slate-100 text-slate-700'}`}>
@@ -504,13 +495,8 @@ function AIChatPanel({ messages, onSend, onInsert }) {
         <div ref={bottomRef} />
       </div>
       <div className="px-3 pb-2">
-        <div className="flex flex-wrap gap-1 mb-2">
-          {AI_QUICK.map((q) => (
-            <button key={q} onClick={() => { onSend(q); }} className="text-[10px] px-2 py-1 rounded-full border border-slate-200 text-slate-500 hover:bg-violet-50 hover:border-violet-200 hover:text-violet-700 transition-colors">{q}</button>
-          ))}
-        </div>
         <div className="flex gap-2">
-          <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && send()} placeholder="Întreabă AI-ul..." className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-100" />
+          <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && send()} placeholder="Ce text vrei să generez?" className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-100" />
           <button onClick={send} className="p-2 bg-violet-700 text-white rounded-lg hover:bg-violet-600"><Send className="w-4 h-4" /></button>
         </div>
       </div>
@@ -631,6 +617,7 @@ function Step2Compose({ blocks, setBlocks, selectedBlockId, setSelectedBlockId, 
   const [dragOverIdx, setDragOverIdx] = useState(null);
   const [rightTab, setRightTab] = useState('props');
   const [aiMessages, setAiMessages] = useState([]);
+  const [mobilePanel, setMobilePanel] = useState(null);
 
   const handlePaletteDragStart = (type) => { setDragType('palette'); setDragData(type); };
   const handleBlockDragStart = (blockId) => { setDragType('reorder'); setDragData(blockId); };
@@ -694,7 +681,7 @@ function Step2Compose({ blocks, setBlocks, selectedBlockId, setSelectedBlockId, 
   return (
     <div className="flex gap-2 h-[calc(100vh-160px)]">
       {/* LEFT — palette (narrower) */}
-      <div className="w-[170px] flex-shrink-0 paper-card overflow-hidden flex flex-col">
+      <div className="hidden lg:flex w-[170px] flex-shrink-0 paper-card overflow-hidden flex-col">
         <div className="flex border-b border-slate-100 bg-white">
           <div className="flex-1 py-2 text-[11px] font-semibold text-slate-700 uppercase tracking-[0.2em] text-center">Blocuri</div>
         </div>
@@ -718,6 +705,11 @@ function Step2Compose({ blocks, setBlocks, selectedBlockId, setSelectedBlockId, 
 
       {/* CENTER — canvas (larger) */}
       <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex items-center gap-2 mb-2 lg:hidden">
+          <button onClick={() => setMobilePanel('palette')} className="px-3 py-2 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 bg-white">Blocuri</button>
+          <button onClick={() => { setRightTab('props'); setMobilePanel('right'); }} className="px-3 py-2 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 bg-white">Proprietăți</button>
+          <button onClick={() => { setRightTab('ai'); setMobilePanel('right'); }} className="px-3 py-2 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 bg-white">AI</button>
+        </div>
         <div className="flex items-center gap-3 paper-card px-3 py-2 mb-2">
           <Mail className="w-4 h-4 text-slate-400" />
           <input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Subiectul emailului..." className="flex-1 text-sm font-semibold text-slate-800 outline-none" />
@@ -767,7 +759,7 @@ function Step2Compose({ blocks, setBlocks, selectedBlockId, setSelectedBlockId, 
       </div>
 
       {/* RIGHT — props / AI (narrower) */}
-      <div className="w-[230px] flex-shrink-0 paper-card overflow-hidden flex flex-col">
+      <div className="hidden lg:flex w-[230px] flex-shrink-0 paper-card overflow-hidden flex-col">
         <div className="flex border-b border-slate-100">
           <button onClick={() => setRightTab('props')} className={`flex-1 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] ${rightTab === 'props' ? 'text-slate-700 border-b-2 border-violet-200' : 'text-slate-400'}`}>Proprietăți</button>
           <button onClick={() => setRightTab('ai')} className={`flex-1 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] flex items-center gap-1 justify-center ${rightTab === 'ai' ? 'text-slate-700 border-b-2 border-violet-200' : 'text-slate-400'}`}><Sparkles className="w-3 h-3" /> AI</button>
@@ -778,6 +770,55 @@ function Step2Compose({ blocks, setBlocks, selectedBlockId, setSelectedBlockId, 
             : <AIChatPanel messages={aiMessages} onSend={handleAISend} onInsert={handleAIInsert} />}
         </div>
       </div>
+
+      {/* Mobile panels */}
+      {mobilePanel === 'palette' && (
+        <div className="lg:hidden fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-black/30" onClick={() => setMobilePanel(null)} />
+          <div className="absolute left-0 top-0 bottom-0 w-72 bg-white border-r border-slate-200 overflow-auto">
+            <div className="flex items-center justify-between px-3 py-3 border-b border-slate-100">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-600">Blocuri</p>
+              <button onClick={() => setMobilePanel(null)} className="text-slate-400 hover:text-slate-600"><X className="w-4 h-4" /></button>
+            </div>
+            <div className="p-2">
+              {BLOCK_PALETTE.map((section) => (
+                <div key={section.section} className="mb-2">
+                  <p className="text-[9px] font-semibold text-slate-500 uppercase tracking-[0.2em] px-1 mb-1">{section.section}</p>
+                  {section.items.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <div key={item.type} draggable onDragStart={() => handlePaletteDragStart(item.type)} onDragEnd={handleDragEnd} className="flex items-center gap-1.5 px-1.5 py-1.5 rounded-lg hover:bg-slate-50 cursor-grab active:cursor-grabbing transition-colors group">
+                        <div className="w-7 h-7 rounded-lg bg-violet-100/60 flex items-center justify-center group-hover:bg-violet-200/60 flex-shrink-0"><Icon className="w-3.5 h-3.5 text-violet-700" /></div>
+                        <div className="min-w-0"><p className="text-[11px] font-semibold text-slate-700 truncate">{item.label}</p><p className="text-[9px] text-slate-400 truncate">{item.desc}</p></div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {mobilePanel === 'right' && (
+        <div className="lg:hidden fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-black/30" onClick={() => setMobilePanel(null)} />
+          <div className="absolute right-0 top-0 bottom-0 w-80 bg-white border-l border-slate-200 overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between border-b border-slate-100 px-2">
+              <div className="flex flex-1">
+                <button onClick={() => setRightTab('props')} className={`flex-1 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] ${rightTab === 'props' ? 'text-slate-700 border-b-2 border-violet-200' : 'text-slate-400'}`}>Proprietăți</button>
+                <button onClick={() => setRightTab('ai')} className={`flex-1 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] flex items-center gap-1 justify-center ${rightTab === 'ai' ? 'text-slate-700 border-b-2 border-violet-200' : 'text-slate-400'}`}><Sparkles className="w-3 h-3" /> AI</button>
+              </div>
+              <button onClick={() => setMobilePanel(null)} className="px-2 text-slate-400 hover:text-slate-600"><X className="w-4 h-4" /></button>
+            </div>
+            <div className="flex-1 overflow-y-auto">
+              {rightTab === 'props'
+                ? <div className="p-2.5"><PropertyPanel block={selectedBlock} onChange={handleBlockChange} /></div>
+                : <AIChatPanel messages={aiMessages} onSend={handleAISend} onInsert={handleAIInsert} />}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

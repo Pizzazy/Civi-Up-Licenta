@@ -300,7 +300,7 @@ export default function DashboardPage() {
             <span className="text-emerald-700 text-xs font-semibold">Online</span>
           </span>
         </div>
-        <div className="flex gap-3 mb-3">
+        <div className="flex flex-col sm:flex-row gap-3 mb-3">
           <input
             value={aiQuery}
             onChange={(e) => setAiQuery(e.target.value)}
@@ -311,7 +311,7 @@ export default function DashboardPage() {
           <button
             onClick={handleAI}
             disabled={aiLoading}
-            className="bg-violet-700 hover:bg-violet-600 disabled:opacity-50 text-white px-5 rounded-xl font-semibold text-sm flex items-center gap-2 transition-colors"
+            className="w-full sm:w-auto justify-center bg-violet-700 hover:bg-violet-600 disabled:opacity-50 text-white px-5 rounded-xl font-semibold text-sm flex items-center gap-2 transition-colors"
           >
             {aiLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
             {aiLoading ? 'Analizez...' : 'Analizează'}

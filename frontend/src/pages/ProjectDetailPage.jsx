@@ -110,6 +110,13 @@ export default function ProjectDetailPage({ project: initialProject, onBack }) {
     return () => { cancelled = true; };
   }, [tab, eventsLoaded, eventsLoading, project.id]);
 
+  useEffect(() => {
+    setEvents([]);
+    setEventsLoaded(false);
+    setEventsLoading(false);
+    setEventError('');
+  }, [project.id]);
+
   const getInitials = (u) => u?.avatar_initials || u?.avatar || (u?.full_name || u?.name || '??').split(' ').map(p => p[0]).join('').substring(0, 2).toUpperCase();
 
   const getEventStatus = (event) => {
@@ -120,7 +127,7 @@ export default function ProjectDetailPage({ project: initialProject, onBack }) {
     if (Number.isNaN(parsed.getTime())) return 'activ';
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    return parsed < today ? 'finalizat' : 'activ';
+    return parsed < today ? 'inactiv' : 'activ';
   };
 
   // Members from API are already user objects {id, full_name, avatar_initials, role}
