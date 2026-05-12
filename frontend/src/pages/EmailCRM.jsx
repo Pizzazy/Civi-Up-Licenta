@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect, Component } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import {
-  Users, PenSquare, Layout, Mail, Plus, Upload, Trash2,
+  Users, PenSquare, Layout, Mail, Plus, Upload, Trash2, Menu,
   ChevronRight, ChevronLeft, Check, Search, X, GripVertical, ArrowUp, ArrowDown,
   Copy, Send, Clock, CheckCircle, Loader2, Sparkles, MessageSquare,
   FileText, Image, Columns, Quote, BarChart3, MousePointerClick, Minus, Type,
@@ -1102,6 +1102,7 @@ function EmailCRMInner() {
   const [emailBlocks, setEmailBlocks] = useState([...DEFAULT_BLOCKS]);
   const [selectedBlockId, setSelectedBlockId] = useState(null);
   const [subject, setSubject] = useState('');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   // Send state
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -1210,8 +1211,8 @@ function EmailCRMInner() {
 
   return (
     <div className="flex h-[calc(100vh-90px)] bg-transparent rounded-2xl overflow-hidden">
-      {/* Sidebar */}
-      <div className="w-[200px] bg-white flex flex-col flex-shrink-0 border-r border-slate-200">
+      {/* Sidebar (desktop) */}
+      <div className="hidden sm:flex w-[200px] bg-white flex-col flex-shrink-0 border-r border-slate-200">
         <div className="px-4 py-4">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center border border-violet-200"><Mail className="w-4 h-4 text-violet-700" /></div>
@@ -1239,8 +1240,49 @@ function EmailCRMInner() {
         </div>
       </div>
 
+      {/* Mobile drawer */}
+      {sidebarOpen && (
+        <div className="sm:hidden fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-black/30" onClick={() => setSidebarOpen(false)} />
+          <div className="absolute left-0 top-0 bottom-0 w-72 bg-white border-r border-slate-200 overflow-auto">
+            <div className="px-4 py-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center border border-violet-200"><Mail className="w-4 h-4 text-violet-700" /></div>
+                <div><p className="text-sm text-slate-900 font-display">CiviUp</p><p className="text-[10px] text-slate-500 uppercase tracking-[0.2em]">Email CRM</p></div>
+              </div>
+            </div>
+            <nav className="px-2 pb-6 space-y-0.5">
+              {NAV.map((item) => {
+                const Icon = item.icon;
+                const active = activePage === item.id;
+                return (
+                  <button key={item.id} onClick={() => { setSidebarOpen(false); if (item.id === 'new-email') startNewEmail(); else setActivePage(item.id); }} className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors ${active ? 'bg-violet-50 text-violet-700 border border-violet-200' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}>
+                    <Icon className="w-4 h-4 flex-shrink-0" />
+                    <span className="flex-1 text-left text-[13px]">{item.label}</span>
+                    {item.badge != null && <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${active ? 'bg-violet-100 text-violet-700' : 'bg-slate-100 text-slate-400'}`}>{item.badge}</span>}
+                  </button>
+                );
+              })}
+            </nav>
+            <div className="px-3 pb-4">
+              <div className="paper-card p-3 text-center">
+                <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-[0.2em]">Plan gratuit Brevo</p>
+                <p className="text-sm font-black text-slate-900">9.000 <span className="text-slate-400 font-semibold text-xs">/ lună</span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main content */}
       <div className="flex-1 overflow-y-auto p-4">
+        {/* Mobile: toggle sidebar button */}
+        <div className="sm:hidden mb-3">
+          <button onClick={() => setSidebarOpen(true)} className="inline-flex items-center gap-2 px-3 py-2 bg-white border border-slate-200 rounded-lg shadow-sm">
+            <Menu className="w-4 h-4 text-slate-700" />
+            <span className="text-sm font-semibold text-slate-700">Meniu</span>
+          </button>
+        </div>
         {activePage === 'contacts' && (
           <ContactsPage contacts={contacts} setContacts={setContacts} groupCounts={groupCounts} refreshContacts={refreshContacts} />
         )}
