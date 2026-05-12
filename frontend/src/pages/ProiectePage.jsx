@@ -36,6 +36,16 @@ export default function ProiectePage() {
   const totalGrant = projects.reduce((s, p) => s + (Number(p.grant_total || p.grant || 0)), 0);
   const totalBeneficiari = projects.reduce((s, p) => s + (Number(p.beneficiari_directi || p.beneficiariDirecti || 0)), 0);
   const finalizate = projects.filter((p) => p.status === 'finalizat' || p.status === 'completed').length;
+  const getProjectStatus = (project) => {
+    const deadline = project?.deadline;
+    if (!deadline) return project?.status || 'activ';
+    const parsed = new Date(`${deadline}T00:00:00`);
+    if (Number.isNaN(parsed.getTime())) return project?.status || 'activ';
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return parsed < today ? 'inactiv' : (project?.status || 'activ');
+  };
+  const activeProjects = projects.filter((p) => getProjectStatus(p) === 'activ').length;
 
   if (loading) {
     return (
@@ -109,7 +119,7 @@ export default function ProiectePage() {
         <StatCard icon={Target} label="Total Granturi" value={`${totalGrant.toLocaleString('ro-RO')} RON`} color="violet" />
         <StatCard icon={Users} label="Beneficiari Direcți" value={String(totalBeneficiari)} color="blue" />
         <StatCard icon={CheckCircle} label="Proiecte Finalizate" value={`${finalizate} / ${projects.length}`} color="emerald" />
-        <StatCard icon={DollarSign} label="Proiecte Active" value={String(projects.filter((p) => p.status === 'activ').length)} color="rose" />
+        <StatCard icon={DollarSign} label="Proiecte Active" value={String(activeProjects)} color="rose" />
       </div>
 
       {projects.length === 0 && !error && (
@@ -132,7 +142,7 @@ export default function ProiectePage() {
                 <h4 className="font-black text-slate-800 group-hover:text-violet-700 transition-colors">{p.name}</h4>
                 <p className="text-xs text-slate-400 mt-0.5">{p.category || '—'} · {(p.members || []).length} membri · deadline {p.deadline || '—'}</p>
               </div>
-              <Badge status={p.status} />
+              <Badge status={getProjectStatus(p)} />
             </div>
             <div className="mb-3">
               <div className="flex justify-between text-xs text-slate-500 mb-1.5">

@@ -5,7 +5,7 @@ import { Menu, X } from 'lucide-react';
 const MODULE_LABELS = {
   dashboard: 'Dashboard & Analize',
   financiar: 'Financiar & OCR',
-  proiecte: 'Proiecte & Granturi',
+  proiecte: 'Proiecte',
   crm: 'Email & CRM',
   'email-crm': 'Email & CRM',
   social: 'Social Media',
