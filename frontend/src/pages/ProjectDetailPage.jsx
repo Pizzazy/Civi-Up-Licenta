@@ -340,10 +340,10 @@ export default function ProjectDetailPage({ project: initialProject, onBack }) {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-100 bg-white rounded-t-2xl overflow-hidden">
+      <div className="flex flex-col sm:flex-row border-b border-slate-100 bg-white rounded-t-2xl overflow-hidden">
         {TABS.map((t) => (
           <button key={t.id} onClick={() => setTab(t.id)}
-            className={`px-5 py-3.5 text-sm font-semibold transition-colors whitespace-nowrap ${tab === t.id ? 'text-violet-700 border-b-2 border-violet-600 bg-violet-50/50' : 'text-slate-500 hover:text-slate-700'}`}>
+            className={`w-full sm:w-auto px-5 py-3.5 text-sm font-semibold transition-colors whitespace-nowrap text-left sm:text-center border-b sm:border-b-0 sm:border-r border-slate-100 ${tab === t.id ? 'text-violet-700 bg-violet-50/50' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}>
             {t.label}
           </button>
         ))}
@@ -352,7 +352,7 @@ export default function ProjectDetailPage({ project: initialProject, onBack }) {
       {/* BUGET TAB */}
       {tab === 'buget' && (
         <div className="space-y-5">
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
             <StatCard icon={Target} label="Grant Total" value={`${grantTotal.toLocaleString()} RON`} color="violet" />
             <StatCard icon={DollarSign} label="Total Cheltuit" value={`${totalSpent.toLocaleString()} RON`} color="rose" />
             <StatCard icon={TrendingUp} label="Sold Rămas" value={`${soldRamas.toLocaleString()} RON`} color="emerald" />
@@ -556,7 +556,7 @@ export default function ProjectDetailPage({ project: initialProject, onBack }) {
               <h4 className="text-sm font-bold text-violet-700">Adaugă Task Nou</h4>
               {taskError && <p className="text-xs text-rose-600">{taskError}</p>}
               <input value={newTask.title} onChange={(e) => setNewTask((p) => ({ ...p, title: e.target.value }))} placeholder="Titlu task..." className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-violet-400" />
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <select value={newTask.assignedTo || ''} onChange={(e) => setNewTask((p) => ({ ...p, assignedTo: e.target.value || null }))} className="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none">
                   <option value="">Neatribuit</option>
                   {members.map((u) => <option key={u.id} value={u.id}>{u.full_name || u.name}</option>)}
@@ -566,7 +566,7 @@ export default function ProjectDetailPage({ project: initialProject, onBack }) {
                 </select>
                 <input type="date" value={newTask.dueDate} onChange={(e) => setNewTask((p) => ({ ...p, dueDate: e.target.value }))} className="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none" />
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <button onClick={addTask} className="bg-violet-600 text-white px-4 py-2 rounded-xl text-sm font-bold">Creează Task</button>
                 <button onClick={() => setShowAddTask(false)} className="border border-slate-200 text-slate-600 px-4 py-2 rounded-xl text-sm">Anulează</button>
               </div>

@@ -320,38 +320,40 @@ export default function FinanciarPage() {
         {loading ? (
           <div className="py-16 flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin text-violet-600" /></div>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left border-b border-slate-100">
-                <th className="px-4 py-3 text-xs text-slate-400 uppercase">Data</th>
-                <th className="px-4 py-3 text-xs text-slate-400 uppercase">Nume</th>
-                <th className="px-4 py-3 text-xs text-slate-400 uppercase">Categorie</th>
-                <th className="px-4 py-3 text-xs text-slate-400 uppercase">Tip Doc</th>
-                <th className="px-4 py-3 text-xs text-slate-400 uppercase">Sumă</th>
-                <th className="px-4 py-3 text-xs text-slate-400 uppercase">Status</th>
-                <th className="px-4 py-3" />
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => {
-                const pendingProof = r.document_type === 'factura' && r.payment_status === 'in_asteptare_dovada';
-                return (
-                  <tr key={r.id} className={`border-b border-slate-50 ${pendingProof ? 'bg-amber-50/60' : ''}`}>
-                    <td className="px-4 py-3 text-xs text-slate-500">{r.expense_date || r.donation_date || r.created_at?.slice(0, 10) || '—'}</td>
-                    <td className="px-4 py-3 font-semibold text-slate-700">{r.furnizor || r.donator_name || r.item_description || '—'}</td>
-                    <td className="px-4 py-3 text-slate-600">{r.category || r.income_category || '—'}</td>
-                    <td className="px-4 py-3 text-slate-600">{r.document_type || '—'}</td>
-                    <td className="px-4 py-3 font-bold text-slate-800">{Number(r.suma || 0).toLocaleString('ro-RO')} RON</td>
-                    <td className="px-4 py-3">{statusBadge(r)}</td>
-                    <td className="px-4 py-3 text-right"><button onClick={() => setSelected(r)} className="p-2 rounded-lg hover:bg-slate-100 text-slate-500"><Eye className="w-4 h-4" /></button></td>
-                  </tr>
-                );
-              })}
-              {rows.length === 0 && (
-                <tr><td colSpan={7} className="py-12 text-center text-sm text-slate-400">Nu există înregistrări pentru filtrele selectate.</td></tr>
-              )}
-            </tbody>
-          </table>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[860px] text-sm">
+              <thead>
+                <tr className="text-left border-b border-slate-100">
+                  <th className="px-4 py-3 text-xs text-slate-400 uppercase">Data</th>
+                  <th className="px-4 py-3 text-xs text-slate-400 uppercase">Nume</th>
+                  <th className="px-4 py-3 text-xs text-slate-400 uppercase">Categorie</th>
+                  <th className="px-4 py-3 text-xs text-slate-400 uppercase">Tip Doc</th>
+                  <th className="px-4 py-3 text-xs text-slate-400 uppercase">Sumă</th>
+                  <th className="px-4 py-3 text-xs text-slate-400 uppercase">Status</th>
+                  <th className="px-4 py-3" />
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((r) => {
+                  const pendingProof = r.document_type === 'factura' && r.payment_status === 'in_asteptare_dovada';
+                  return (
+                    <tr key={r.id} className={`border-b border-slate-50 ${pendingProof ? 'bg-amber-50/60' : ''}`}>
+                      <td className="px-4 py-3 text-xs text-slate-500">{r.expense_date || r.donation_date || r.created_at?.slice(0, 10) || '—'}</td>
+                      <td className="px-4 py-3 font-semibold text-slate-700">{r.furnizor || r.donator_name || r.item_description || '—'}</td>
+                      <td className="px-4 py-3 text-slate-600">{r.category || r.income_category || '—'}</td>
+                      <td className="px-4 py-3 text-slate-600">{r.document_type || '—'}</td>
+                      <td className="px-4 py-3 font-bold text-slate-800">{Number(r.suma || 0).toLocaleString('ro-RO')} RON</td>
+                      <td className="px-4 py-3">{statusBadge(r)}</td>
+                      <td className="px-4 py-3 text-right"><button onClick={() => setSelected(r)} className="p-2 rounded-lg hover:bg-slate-100 text-slate-500"><Eye className="w-4 h-4" /></button></td>
+                    </tr>
+                  );
+                })}
+                {rows.length === 0 && (
+                  <tr><td colSpan={7} className="py-12 text-center text-sm text-slate-400">Nu există înregistrări pentru filtrele selectate.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 
